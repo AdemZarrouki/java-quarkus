@@ -10,7 +10,13 @@ import org.mapstruct.Mapper;
 public interface TaskListMapper {
 
   default List<TaskListEto> toEtos(List<TaskListEntity> items) {
-    return null;
+    if (items == null) {
+      return List.of();
+    }
+
+    return items.stream()
+        .map(this::toEto)
+        .toList();
   }
 
   TaskListEto toEto(TaskListEntity item);

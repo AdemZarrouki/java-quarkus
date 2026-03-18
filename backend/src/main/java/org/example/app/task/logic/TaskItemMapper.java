@@ -11,11 +11,15 @@ public interface TaskItemMapper {
 
 
   default List<TaskItemEto> toEtos(List<TaskItemEntity> items) {
-    return null;
+    if (items == null) {
+      return List.of();
+    }
+    return items.stream()
+        .map(this::toEto)
+        .toList();
   }
 
   TaskItemEto toEto(TaskItemEntity item);
 
   TaskItemEntity toEntity(TaskItemEto item);
-
 }
