@@ -20,7 +20,7 @@ public class UcSaveTaskList {
   @Inject
   TaskListMapper taskListMapper;
 
-  public TaskListEto saveItem(TaskListEto listEto) {
+  public TaskListEto saveList(TaskListEto listEto) {
     TaskListEntity taskListEntity = taskListRepository.save(taskListMapper.toEntity(listEto));
     return taskListMapper.toEto(taskListEntity);
   }
