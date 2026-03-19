@@ -9,6 +9,11 @@ import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 
+import org.eclipse.microprofile.openapi.annotations.Operation;
+import org.eclipse.microprofile.openapi.annotations.media.Content;
+import org.eclipse.microprofile.openapi.annotations.media.Schema;
+import org.eclipse.microprofile.openapi.annotations.parameters.Parameter;
+import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.example.app.task.common.TaskItemEto;
 import org.example.app.task.common.TaskListCto;
 import org.example.app.task.common.TaskListEto;
@@ -38,6 +43,20 @@ public class TaskService {
 
   @GET
   @Path("/lists")
+  @Operation(
+      summary = "Find all TaskLists",
+      description = "Returns a list of all TaskLists in the system."
+  )
+  @APIResponse(
+      responseCode = "200",
+      description = "A list of TaskLists was successfully retrieved.",
+      content = @Content(mediaType = "application/json",
+          schema = @Schema(implementation = TaskListEto.class))
+  )
+  @APIResponse(
+      responseCode = "404",
+      description = "No TaskLists were found in the system."
+  )
   public List<TaskListEto> findAllTaskLists() {
     List<TaskListEto> tasklist = this.ucFindTaskList.findAll();
     if (tasklist.isEmpty()) {
@@ -48,7 +67,21 @@ public class TaskService {
 
   @GET
   @Path("/list-with-items/{id}")
-  public TaskListCto findTaskListWithItems(@PathParam("id") Long id) {
+  @Operation(
+      summary = "Find a TaskList with its items",
+      description = "Returns a TaskList along with its associated TaskItems based on the provided ID."
+  )
+  @APIResponse(
+      responseCode = "200",
+      description = "The TaskList with its items was successfully retrieved.",
+      content = @Content(mediaType = "application/json",
+          schema = @Schema(implementation = TaskListCto.class))
+  )
+  @APIResponse(
+      responseCode = "404",
+      description = "A TaskList with the specified ID was not found in the system."
+  )
+  public TaskListCto findTaskListWithItems(@Parameter(description = "Task List Id") @PathParam("id") Long id) {
     TaskListCto taskListCto = ucFindTaskList.findTaskListWithItems(id);
     if (taskListCto == null) {
       throw new NotFoundException("TaskList with id " + id + " does not exist.");
@@ -58,7 +91,20 @@ public class TaskService {
 
   @GET
   @Path("/list/{id}")
-  public TaskListEto findTaskList(@PathParam("id") Long id) {
+  @Operation(
+      summary = "Find a TaskList by ID",
+      description = "Returns a TaskList based on the provided ID."
+  )
+  @APIResponse(
+      description = "The TaskList was successfully retrieved.",
+      content = @Content(mediaType = "application/json",
+          schema = @Schema(implementation = TaskListEto.class))
+  )
+  @APIResponse(
+      responseCode = "404",
+      description = "A TaskList with the specified ID was not found in the system."
+  )
+  public TaskListEto findTaskList(@Parameter(description = "Task List id") @PathParam("id") Long id) {
     TaskListEto task = this.ucFindTaskList.findById(id);
     if (task == null) {
       throw new NotFoundException("TaskList with id " + id + " does not exist.");
@@ -68,20 +114,58 @@ public class TaskService {
 
   @DELETE
   @Path("/list/{id}")
+  @Operation(
+      summary = "Delete a TaskList by ID",
+      description = "Deletes a TaskList based on the provided ID."
+  )
+  @APIResponse(
+      description = "The TaskList was successfully deleted.",
+      content = @Content(mediaType = "application/json")
+  )
+  @APIResponse(
+      responseCode = "404",
+      description = "A TaskList with the specified ID was not found in the system."
+  )
   public void deleteListItem(@PathParam("id") Long id) {
     this.ucDeleteTaskList.deleteById(id);
   }
 
   @POST
   @Path("/list")
-  public TaskListEto saveListItem(TaskListEto listEto) {
+  @Operation(
+      summary = "Save a TaskList",
+      description = "Saves a TaskList. If the TaskList has an ID, it will be updated; otherwise, a new TaskList will be created."
+  )
+  @APIResponse(
+      description = "The TaskList was successfully saved.",
+      content = @Content(mediaType = "application/json",
+          schema = @Schema(implementation = TaskListEto.class))
+  )
+  @APIResponse(
+      responseCode = "400",
+      description = "Invalid TaskList data provided in the request."
+  )
+  public TaskListEto saveListItem(@Parameter(description = "New task List") TaskListEto listEto) {
     return this.ucSaveTaskList.saveList(listEto);
   }
 
 
   @GET
   @Path("/item/{id}")
-  public TaskItemEto findTaskItem(@PathParam("id") Long id) {
+  @Operation(
+      summary = "Find a TaskItem by ID",
+      description = "Returns a TaskItem based on the provided ID."
+  )
+  @APIResponse(
+      description = "The TaskItem was successfully retrieved.",
+      content = @Content(mediaType = "application/json",
+          schema = @Schema(implementation = TaskItemEto.class))
+  )
+  @APIResponse(
+      responseCode = "404",
+      description = "A TaskItem with the specified ID was not found in the system."
+  )
+  public TaskItemEto findTaskItem(@Parameter(description = "Task Item id") @PathParam("id") Long id) {
     TaskItemEto task = this.ucFindTaskItem.findById(id);
     if (task == null) {
       throw new NotFoundException("TaskItem with id " + id + " does not exist.");
@@ -92,14 +176,38 @@ public class TaskService {
 
   @DELETE
   @Path("/item/{id}")
-  public void deleteTaskItem(@PathParam("id") Long id) {
+  @Operation(
+      summary = "Delete a TaskItem by ID",
+      description = "Deletes a TaskItem based on the provided ID."
+  )
+  @APIResponse(
+      description = "The TaskItem was successfully deleted.",
+      content = @Content(mediaType = "application/json")
+  )
+  @APIResponse(
+      responseCode = "404",
+      description = "A TaskItem with the specified ID was not found in the system."
+  )
+  public void deleteTaskItem(@Parameter(description = "Task Item id") @PathParam("id") Long id) {
     this.ucDeleteTaskItem.deleteById(id);
   }
 
   @POST
   @Path("/item")
+  @Operation(
+      summary = "Save a TaskItem",
+      description = "Saves a TaskItem. If the TaskItem has an ID, it will be updated; otherwise, a new TaskItem will be created."
+  )
+  @APIResponse(
+      description = "The TaskItem was successfully saved.",
+      content = @Content(mediaType = "application/json",
+          schema = @Schema(implementation = TaskItemEto.class))
+  )
+  @APIResponse(
+      responseCode = "400",
+      description = "Invalid TaskItem data provided in the request."
+  )
   public TaskItemEto saveTaskItem(TaskItemEto item) {
     return this.ucSaveTaskItem.saveItem(item);
   }
-
 }
