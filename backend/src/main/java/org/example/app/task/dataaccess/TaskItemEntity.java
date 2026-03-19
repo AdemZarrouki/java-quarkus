@@ -1,9 +1,13 @@
 package org.example.app.task.dataaccess;
 
-import jakarta.persistence.*;
-import org.example.app.general.dataaccess.ApplicationPersistenceEntity;
-
 import java.time.LocalDateTime;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+
+import org.example.app.general.dataaccess.ApplicationPersistenceEntity;
 
 @Entity
 @Table(name = "TASK_ITEM")

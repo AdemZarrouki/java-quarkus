@@ -1,5 +1,6 @@
 package org.example.app.task.service;
 
+import java.net.URI;
 import java.util.List;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.DELETE;
@@ -8,8 +9,10 @@ import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.core.Response;
 
 import org.eclipse.microprofile.openapi.annotations.Operation;
+import org.eclipse.microprofile.openapi.annotations.enums.SchemaType;
 import org.eclipse.microprofile.openapi.annotations.media.Content;
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import org.eclipse.microprofile.openapi.annotations.parameters.Parameter;
@@ -17,6 +20,7 @@ import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.example.app.task.common.TaskItemEto;
 import org.example.app.task.common.TaskListCto;
 import org.example.app.task.common.TaskListEto;
+import org.example.app.task.logic.UcAddRandomActivityTaskItem;
 import org.example.app.task.logic.UcDeleteTaskItem;
 import org.example.app.task.logic.UcDeleteTaskList;
 import org.example.app.task.logic.UcFindTaskItem;
@@ -39,6 +43,8 @@ public class TaskService {
   private UcSaveTaskItem ucSaveTaskItem;
   @Inject
   private UcSaveTaskList ucSaveTaskList;
+  @Inject
+  UcAddRandomActivityTaskItem ucAddRandomActivityTaskItem;
 
 
   @GET
@@ -209,5 +215,18 @@ public class TaskService {
   )
   public TaskItemEto saveTaskItem(TaskItemEto item) {
     return this.ucSaveTaskItem.saveItem(item);
+  }
+
+  // snippet
+  @POST
+  @Path("/list/{id}/random-activity")
+  @Operation(summary = "Add random activity", description = "Add a random activity to this task list")
+  @APIResponse(responseCode = "201", description = "Task item successfully added")
+  @APIResponse(responseCode = "500", description = "Server unavailable or a server-side error occurred")
+  public Response addRandomActivity(
+      @Parameter(description = "The id of the task list for which to add the task", required = true, example = "1", schema = @Schema(type = SchemaType.INTEGER)) @PathParam("id") Long id) {
+
+    Long taskItemId = this.ucAddRandomActivityTaskItem.addRandom(id);
+    return Response.created(URI.create("/task/item/" + taskItemId)).build();
   }
 }
